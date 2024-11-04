@@ -47,8 +47,14 @@ jobs:
         chmod 600 private_key
 
     - name: Deploy application to the server
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        HOST: ${{ secrets.HOST }}
+        USER: ${{ secrets.USER }}
       run: |
-        ssh -o StrictHostKeyChecking=no -i private_key -t $USER@$HOST << 'EOF'
+        echo "$SSH_PRIVATE_KEY" > private_key
+        chmod 600 private_key
+        ssh -o StrictHostKeyChecking=no -i private_key -tt $USER@$HOST << 'EOF'
           # Ensure Docker container cleanup if an old container exists
           docker stop web-app || true
           docker rm web-app || true
@@ -58,7 +64,5 @@ jobs:
           docker build -t local-web-app .
           docker run -d -p 5000:5000 --name web-app local-web-app
         EOF
+        rm -f private_key  # Clean up private key
 
-    - name: Clean up SSH private key
-      run: |
-        rm -f private_key
