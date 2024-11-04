@@ -56,13 +56,14 @@ jobs:
         chmod 600 private_key
         ssh -o StrictHostKeyChecking=no -i private_key -tt $USER@$HOST << 'EOF'
           # Ensure Docker container cleanup if an old container exists
-          docker stop web-app || true
-          docker rm web-app || true
+          docker stop crud-api || true
+          docker rm crud-api || true
           
           # Navigate to app directory and rebuild
-          cd /path/to/your/app  # Change to the directory where your app is located
-          docker build -t local-web-app .
-          docker run -d -p 5000:5000 --name web-app local-web-app
+          cd /home/test
+          docker build -t crud-api .
+          docker run -d -p 5000:5000 --name crud-api crud-api:latest
         EOF
         rm -f private_key  # Clean up private key
+
 
