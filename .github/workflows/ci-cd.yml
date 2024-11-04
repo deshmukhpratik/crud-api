@@ -37,7 +37,7 @@ jobs:
     needs: build
 
     steps:
-    - name: Deploy to server
+    - name: Set up SSH key and permissions
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         HOST: ${{ secrets.HOST }}
@@ -45,8 +45,20 @@ jobs:
       run: |
         echo "$SSH_PRIVATE_KEY" > private_key
         chmod 600 private_key
-        ssh -o StrictHostKeyChecking=no -i private_key $USER@$HOST << 'EOF'
+
+    - name: Deploy application to the server
+      run: |
+        ssh -o StrictHostKeyChecking=no -i private_key -t $USER@$HOST << 'EOF'
+          # Ensure Docker container cleanup if an old container exists
+          docker stop web-app || true
+          docker rm web-app || true
+          
+          # Navigate to app directory and rebuild
           cd /path/to/your/app  # Change to the directory where your app is located
           docker build -t local-web-app .
           docker run -d -p 5000:5000 --name web-app local-web-app
         EOF
+
+    - name: Clean up SSH private key
+      run: |
+        rm -f private_key
