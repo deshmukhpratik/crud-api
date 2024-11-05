@@ -11,7 +11,7 @@ items = [
 # Route for the root URL
 @app.route('/')
 def home():
-    return "Welcome to the CRUD API!"
+    return "Welcome to the CRUD API new project!"
 
 # Read all items
 @app.route('/items', methods=['GET'])
