@@ -64,6 +64,3 @@ jobs:
           docker build -t crud-api .
           docker run -d -p 5000:5000 --name crud-api crud-api:latest
         EOF
-        rm -f private_key  # Clean up private key
-
-
